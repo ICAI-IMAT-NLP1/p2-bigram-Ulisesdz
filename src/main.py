@@ -14,7 +14,7 @@ from bigram_model import (
 
 if __name__ == "__main__":
     # Define file path and tokens
-    file_path = "data/nombres_raw.txt"
+    file_path = "../data/nombres_raw.txt"
     start_token = "-"
     end_token = "."
     alphabet = "abcdefghijklmnopqrstuvwxyz "

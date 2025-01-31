@@ -5,7 +5,7 @@ import torch.nn.functional as F
 
 
 def load_and_preprocess_data(
-    filepath: str, start_token: str = "!", end_token: str = "."
+    filepath: str, start_token: str = "<S>", end_token: str = "<E>"
 ) -> List[Tuple[str, str]]:
     """
     Load text from a file and preprocess them into bigrams with specified start and end tokens.
@@ -30,7 +30,16 @@ def load_and_preprocess_data(
         lines: List[str] = file.read().splitlines()
 
     # TODO
-    bigrams: List[Tuple[str, str]] = None
+    bigrams: List[Tuple[str, str]] = []
+    for line in lines:
+        line = line.lower()
+        line = line.split()
+        line = line[:(len(line)-2)]
+        line = ' '.join(line)
+        line = start_token + line + end_token
+        for i in range(len(line)-1):           
+            bigrams.append((line[i], line[i+1])) 
+
 
     return bigrams
 
@@ -49,7 +58,12 @@ def char_to_index(alphabet: str, start_token: str, end_token: str) -> Dict[str, 
     """
     # Create a dictionary with start token at the beginning and end token at the end
     # TODO
-    char_to_idx: Dict[str, int] = None
+    char_to_idx: Dict[str, int] = {}
+    
+    char_to_map = start_token + alphabet + end_token
+    
+    for i in range(len(char_to_map)):
+        char_to_idx[char_to_map[i]] = i
 
     return char_to_idx
 
@@ -66,7 +80,9 @@ def index_to_char(char_to_index: Dict[str, int]) -> Dict[int, str]:
     """
     # Reverse the char_to_index mapping
     # TODO
-    idx_to_char: Dict[int, str] = None
+    idx_to_char: Dict[int, str] = {}
+    for key, value in char_to_index.items():
+        idx_to_char[value] = key    
 
     return idx_to_char
 
@@ -93,10 +109,15 @@ def count_bigrams(
 
     # Initialize a 2D tensor for counting bigrams
     # TODO
-    bigram_counts: torch.Tensor = None
+    bigram_counts: torch.Tensor = torch.zeros(len(char_to_idx), len(char_to_idx))
 
     # Iterate over each bigram and update the count in the tensor
-    # TODO
+    for bigram in bigrams:
+        if bigram[0] in char_to_idx and bigram[1] in char_to_idx:
+            row = char_to_idx[bigram[0]]
+            col = char_to_idx[bigram[1]]
+            bigram_counts[row, col] += 1
+        
 
     return bigram_counts
 
